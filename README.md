@@ -2,13 +2,11 @@
 Description: System for to realizae votes
 
 
-# Instala dependencias
+# Dependencies Install
 npm i
 
-npm run dev
-
-
--- correr proyecto
-npx nodemon src/index.ts
+## Run Project
+- npm run dev
+- npx nodemon src/index.ts
 
 
