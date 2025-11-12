@@ -1,5 +1,5 @@
 import { pool } from '../config/database';
-import { CreatePollRequest, PollDB, PollOptionDB, PollOptionWithVotes } from '../types/poll.types';
+import { CreatePollRequest, PollDB, PollOptionDB, PollOptionWithVotes, VoteDB, VoteRequest } from '../types/poll.types';
 
 export const createPoll = async (
   pollData: CreatePollRequest
@@ -78,4 +78,37 @@ export const getPollById = async ( pollId: string ): Promise<{ poll: PollDB; opt
   } finally {
     client.release();
   }
+};
+
+export const verifyPollExists = async (pollId: string): Promise<boolean> => {
+  const result = await pool.query(
+    'SELECT 1 FROM polls WHERE id = $1',
+    [pollId]
+  );
+  return result.rows.length > 0;
+};
+
+export const verifyOptionBelongsToPoll = async (
+  optionId: string,
+  pollId: string
+): Promise<boolean> => {
+  const result = await pool.query(
+    'SELECT 1 FROM poll_options WHERE id = $1 AND poll_id = $2',
+    [optionId, pollId]
+  );
+  return result.rows.length > 0;
+};
+
+export const createVote = async (
+  pollId: string,
+  voteData: VoteRequest
+): Promise<VoteDB> => {
+  const result = await pool.query<VoteDB>(
+    `INSERT INTO votes (poll_id, option_id, voter_hash) 
+     VALUES ($1, $2, $3) 
+     RETURNING id, poll_id, option_id, voter_hash, created_at`,
+    [pollId, voteData.option_id, voteData.voter_hash || null]
+  );
+
+  return result.rows[0];
 };

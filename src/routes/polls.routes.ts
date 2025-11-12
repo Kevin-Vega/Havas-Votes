@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { savePoll,getPollById,savePollById } from '../controllers/polls.controller';
+import { savePoll, getPollById, savePollById } from '../controllers/polls.controller';
 
 const router = Router();
 
