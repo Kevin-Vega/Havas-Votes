@@ -12,6 +12,14 @@ export const pool = new Pool({
   database: process.env.DB_NAME,
 });
 
+(async () => {
+  try {
+    const client = await pool.connect();
+    console.log('Connected to PostgreSQL successfully');
+    client.release();
+  } catch (err) {
+    console.error('Failed to connect to PostgreSQL:', err instanceof Error ? err.message : String(err));
+  }
+})();
 
-pool.on('connect', () => console.log('Conectado a PostgreSQL'));
-pool.on('error', (err) => console.error('Error en la conexión a PostgreSQL:', err));
+pool.on('error', (err) => console.error('Unexpected pool error:', err));
