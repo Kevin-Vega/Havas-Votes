@@ -3,12 +3,12 @@ import dotenv from 'dotenv';
 
 import pollsRoutes from './routes/polls.routes';
 
-const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
-dotenv.config({ path: envFile });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+}
 
 const app = express();
 const port = process.env.PORT || 3001;
-
 
 app.use(express.json());
 

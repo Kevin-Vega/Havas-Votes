@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "build": "tsc",
-    "start": "node src/index.ts"
+    "start": "node dist/index.js",
+    "start:prod": "SET NODE_ENV=production&& node dist/index.js"
   },
   "keywords": [],
   "author": "",

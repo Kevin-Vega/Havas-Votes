@@ -46,17 +46,15 @@ export interface GetPollByIdResponse {
 
 export interface VoteRequest {
   option_id: string;
-  voter_hash?: string;
 }
 
 export interface VoteDB {
   id: number;
   poll_id: string;
   option_id: string;
-  voter_hash: string | null;
   created_at: Date;
 }
-
+  
 export interface VoteResponse {
   id: number;
   poll_id: string;

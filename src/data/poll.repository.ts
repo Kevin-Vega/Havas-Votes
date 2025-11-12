@@ -104,11 +104,12 @@ export const createVote = async (
   voteData: VoteRequest
 ): Promise<VoteDB> => {
   const result = await pool.query<VoteDB>(
-    `INSERT INTO votes (poll_id, option_id, voter_hash) 
-     VALUES ($1, $2, $3) 
-     RETURNING id, poll_id, option_id, voter_hash, created_at`,
-    [pollId, voteData.option_id, voteData.voter_hash || null]
+    `INSERT INTO votes (poll_id, option_id) 
+     VALUES ($1, $2) 
+     RETURNING id, poll_id, option_id, created_at`,
+    [pollId, voteData.option_id]
   );
 
   return result.rows[0];
 };
+
