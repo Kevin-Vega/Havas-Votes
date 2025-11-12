@@ -28,3 +28,18 @@ export interface CreatePollResponse {
   options: PollOptionDB[];
   created_at: Date;
 }
+
+export interface PollOptionWithVotes {
+  id: string;
+  label: string;
+  position: number;
+  votes: number;
+}
+
+export interface GetPollByIdResponse {
+  id: string;
+  title: string;
+  options: PollOptionWithVotes[];
+  created_at: Date;
+  total_votes: number;
+}

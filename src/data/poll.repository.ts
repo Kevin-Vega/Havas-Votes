@@ -1,5 +1,5 @@
 import { pool } from '../config/database';
-import { CreatePollRequest, PollDB, PollOptionDB } from '../types/poll.types';
+import { CreatePollRequest, PollDB, PollOptionDB, PollOptionWithVotes } from '../types/poll.types';
 
 export const createPoll = async (
   pollData: CreatePollRequest
@@ -36,6 +36,45 @@ export const createPoll = async (
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const getPollById = async ( pollId: string ): Promise<{ poll: PollDB; options: PollOptionWithVotes[] } | null> => {
+  const client = await pool.connect();
+
+  try {
+    const pollResult = await client.query<PollDB>(
+      `SELECT id, title, created_at 
+       FROM polls 
+       WHERE id = $1`,
+      [pollId]
+    );
+
+    if (pollResult.rows.length === 0) {
+      return null;
+    }
+
+    const poll = pollResult.rows[0];
+
+    const optionsResult = await client.query<PollOptionWithVotes>(
+      `SELECT 
+        po.id,
+        po.label,
+        po.position,
+        COUNT(v.id)::int AS votes
+      FROM poll_options po
+      LEFT JOIN votes v ON v.option_id = po.id
+      WHERE po.poll_id = $1
+      GROUP BY po.id, po.label, po.position
+      ORDER BY po.position ASC`,
+      [pollId]
+    );
+
+    const options = optionsResult.rows;
+
+    return { poll, options };
   } finally {
     client.release();
   }

@@ -1,5 +1,5 @@
-import { createPoll } from '../data/poll.repository';
-import { CreatePollRequest, CreatePollResponse } from '../types/poll.types';
+import { createPoll, getPollById } from '../data/poll.repository';
+import { CreatePollRequest, CreatePollResponse, GetPollByIdResponse } from '../types/poll.types';
 
 export const createNewPoll = async (
   pollData: CreatePollRequest
@@ -34,5 +34,31 @@ export const createNewPoll = async (
     title: poll.title,
     options,
     created_at: poll.created_at,
+  };
+};
+
+export const getPollDetailsById = async (pollId: string ): Promise<GetPollByIdResponse> => {
+  // Validar formato UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(pollId)) {
+    throw new Error('Invalid poll ID format');
+  }
+
+  const result = await getPollById(pollId);
+
+  if (!result) {
+    throw new Error('Poll not found');
+  }
+
+  const { poll, options } = result;
+  
+  const totalVotes = options.reduce((sum, option) => sum + option.votes, 0);
+
+  return {
+    id: poll.id,
+    title: poll.title,
+    options,
+    created_at: poll.created_at,
+    total_votes: totalVotes,
   };
 };
